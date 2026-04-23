@@ -63,7 +63,7 @@ function arvioiRiski(data) {
 }
 
 function renderoiTulos(arvio) {
-  riskBadge.textContent = `Riski: ${arvio.riskitaso}`;
+  riskBadge.textContent = arvio.otsikko || "Tilannearvio";
   riskBadge.className = `badge ${arvio.variLuokka}`;
   selitys.textContent = arvio.selitysTeksti;
 
