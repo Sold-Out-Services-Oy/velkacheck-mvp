@@ -57,8 +57,6 @@
               <option value="">Valitse</option>
               <option value="Kyllä">Kyllä</option>
               <option value="Ei">Ei</option>
-            </select>
-          </label>
 
           <button type="submit" class="btn btn--primary">Arvioi tilanteesi</button>
         </form>
@@ -67,7 +65,6 @@
           <div id="riskBadge" class="badge">Riski</div>
           <p id="selitys"></p>
           <ul id="bulletit"></ul>
-          <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>
         </section>
 </html>
 <div class="next-steps">
@@ -78,7 +75,12 @@
     <li>Luo henkilökohtainen poistopyyntö ja toimita se viranomaiselle</li>
   </ul>
 </div>
-        <section class="draft-section">
+          <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>  
+              <div class="draft-cta">
+  <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>
+  <p class="draft-help">Saat valmiin asiakirjan, jota voit käyttää sellaisenaan tai muokata tarvittaessa.</p>
+</div>
+              <section class="draft-section">
           <label for="poistopyyntoTeksti">Valmis velan poistopyyntö</label>
           <textarea id="poistopyyntoTeksti" rows="10" placeholder="Luonnos ilmestyy tähän..."></textarea>
           <button id="kopioi asiakirja" type="button" class="btn">Kopioi asiakirja</button>
