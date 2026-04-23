@@ -27,7 +27,7 @@ function arvioiRiski(data) {
   } else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
     riskitaso = "keltainen";
     variLuokka = "badge--yellow";
-    selitysTeksti = "Velkatyyppi edellyttää tarkkaa lisäselvitystä ennen jatkotoimia.";
+    selitysTeksti = "Tilanne vaatii tarkempaa selvitystä.";
     huomiot.push(`${data.velkatyyppi} → tapaus merkitty tarkempaan arvioon.`);
   }
 
