@@ -191,3 +191,7 @@ textarea {
   padding-left: 18px;
   margin: 8px 0 0;
 }
+.btn--primary {
+  font-size: 1.1rem;
+  padding: 14px;
+}
