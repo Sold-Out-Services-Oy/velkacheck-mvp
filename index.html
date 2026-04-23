@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VelkaCheck MVP</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <header class="card__header">
+          <h1>VelkaCheck MVP</h1>
+          <p>Arvioi velkatilanteen riski nopeasti ja luonnostele poistopyyntö.</p>
+        </header>
+
+        <form id="velkaForm" class="form">
+          <label>
+            Velkatyyppi
+            <select id="velkatyyppi" required>
+              <option value="">Valitse velkatyyppi</option>
+              <option value="Ulosotto">Ulosotto</option>
+              <option value="Verovelka">Verovelka</option>
+              <option value="Elatusapu">Elatusapu</option>
+            </select>
+          </label>
+
+          <label>
+            Tuomion vuosi
+            <input type="number" id="tuomionVuosi" min="1900" max="2100" required />
+          </label>
+
+          <label>
+            Velan aloitusvuosi
+            <input type="number" id="aloitusVuosi" min="1900" max="2100" required />
+          </label>
+
+          <label>
+            Viimeisin maksuvuosi
+            <input type="number" id="viimeisinMaksuvuosi" min="1900" max="2100" required />
+          </label>
+
+          <label>
+            Maksettu yhteensä (€)
+            <input type="number" id="maksettuYhteensa" min="0" step="0.01" required />
+          </label>
+
+          <label>
+            Jäljellä oleva velka (€)
+            <input type="number" id="jaljellaOlevaVelka" min="0" step="0.01" required />
+          </label>
+
+          <label>
+            Onko ulosotossa
+            <select id="ulosotossa" required>
+              <option value="">Valitse</option>
+              <option value="Kyllä">Kyllä</option>
+              <option value="Ei">Ei</option>
+            </select>
+          </label>
+
+          <button type="submit" class="btn btn--primary">Arvioi riski</button>
+        </form>
+
+        <section id="tulos" class="result hidden" aria-live="polite">
+          <div id="riskBadge" class="badge">Riski</div>
+          <p id="selitys"></p>
+          <ul id="bulletit"></ul>
+          <button id="luoLuonnos" type="button" class="btn">Luo poistopyyntöluonnos</button>
+        </section>
+
+        <section class="draft-section">
+          <label for="poistopyyntoTeksti">Poistopyyntöluonnos</label>
+          <textarea id="poistopyyntoTeksti" rows="10" placeholder="Luonnos ilmestyy tähän..."></textarea>
+          <button id="kopioiTeksti" type="button" class="btn">Kopioi teksti</button>
+        </section>
+
+        <footer class="disclaimer">
+          Tämä palvelu tarjoaa automaattista analyysiä ja asiakirjaluonnoksia. Se ei ole asianajopalvelu tai sitova oikeudellinen neuvonta.
+        </footer>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
