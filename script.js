@@ -14,32 +14,41 @@ function arvioiRiski(data) {
   const velanIka = nykyVuosi - data.aloitusVuosi;
   const vuodetViimeMaksusta = nykyVuosi - data.viimeisinMaksuvuosi;
 
-  let riskitaso = "vihreä";
-  let variLuokka = "badge--green";
-  let selitysTeksti = "Tapauksen tiedot eivät viittaa kohonneeseen välittömään riskiin.";
-  const huomiot = [];
+let riskitaso = "vihreä";
+let variLuokka = "badge--green";
+let otsikko = "Tilanne näyttää normaalilta";
+let selitysTeksti = "Tietojen perusteella velkatilanteessa ei näy selviä merkkejä virheistä tai vanhentumisesta. Voit halutessasi tarkistaa tilanteen tarkemmin varmistaaksesi oikean lopputuloksen.";
+const huomiot = [];
 
-  if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
-    riskitaso = "punainen";
-    variLuokka = "badge--red";
-    selitysTeksti = "Ulosottovelka on ollut avoinna yli 15 vuotta, mikä nostaa riskitason korkeaksi.";
-    huomiot.push("Ulosotto + yli 15 vuotta → korkea prioriteetti jatkotoimille.");
-  } else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
-    riskitaso = "keltainen";
-    variLuokka = "badge--yellow";
-    selitysTeksti = "Tilanne vaatii tarkempaa selvitystä.";
-    huomiot.push(`${data.velkatyyppi} → tapaus merkitty tarkempaan arvioon.`);
-  }
+if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
+  riskitaso = "punainen";
+  variLuokka = "badge--red";
+  otsikko = "Sinulla voi olla merkittävä mahdollisuus";
+  selitysTeksti = "Tietojen perusteella velkatilanteessa voi olla mahdollisuus vanhentumiseen tai virheeseen. Tämä voi vaikuttaa velan määrään tai poistumiseen. Suosittelemme toimimaan nopeasti – tällä voi olla merkittävä vaikutus velkatilanteeseesi.";
+  huomiot.push("Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä.");
+}
+} else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
+  riskitaso = "keltainen";
+  variLuokka = "badge--yellow";
+  otsikko = "Tilanne vaatii tarkempaa selvitystä";
+  selitysTeksti = "Velkatilanteessa on tekijöitä, jotka voivat vaikuttaa oikeuksiisi. Suosittelemme tarkempaa analyysiä ennen jatkotoimia. Tässä tilanteessa lisäselvitys voi johtaa merkittävään taloudelliseen hyötyyn.";
 
-  if (vuodetViimeMaksusta > 3) {
-    huomiot.push("Maksuja liian myöhään → mahdollinen takaisinsaanti.");
-  }
-
-  if (data.ulosotossa === "Kyllä") {
-    huomiot.push("Velka on tällä hetkellä ulosotossa.");
+  if (data.velkatyyppi === "Elatusapu") {
+    huomiot.push("Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä.");
   } else {
-    huomiot.push("Velka ei ole tällä hetkellä ulosotossa.");
+    huomiot.push("Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen.");
   }
+}
+
+if (vuodetViimeMaksusta > 3) {
+  huomiot.push("Maksujen ajoitus voi antaa aiheen lisäselvitykseen ja mahdolliseen takaisinsaantiin.");
+}
+
+if (data.ulosotossa === "Kyllä") {
+  huomiot.push("Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä.");
+} else {
+  huomiot.push("Asia ei ole tällä hetkellä ulosotossa.");
+}
 
   const maksusuhde = data.maksettuYhteensa / (data.maksettuYhteensa + data.jaljellaOlevaVelka || 1);
   if (maksusuhde >= 0.7) {
@@ -52,14 +61,15 @@ function arvioiRiski(data) {
     huomiot.push("Suositus: kokoa kaikki maksutositteet jatkokäsittelyä varten.");
   }
 
-  return {
-    riskitaso,
-    variLuokka,
-    selitysTeksti,
-    huomiot: huomiot.slice(0, 3),
-    velanIka,
-    vuodetViimeMaksusta,
-  };
+return {
+  riskitaso,
+  variLuokka,
+  otsikko,
+  selitysTeksti,
+  huomiot: huomiot.slice(0, 3),
+  velanIka,
+  vuodetViimeMaksusta,
+};
 }
 
 function renderoiTulos(arvio) {
@@ -80,7 +90,7 @@ function renderoiTulos(arvio) {
 function luoPoistopyyntoTeksti(data, arvio) {
   return `Vastaanottaja: Toimivaltainen viranomainen
 
-Aihe: Poistopyyntöluonnos velkatapaukseen
+Aihe: Velan poistopyyntö
 
 Pyydän arvioimaan velkatapaukseni poistamista tai kohtuullistamista seuraavilla tiedoilla:
 - Velkatyyppi: ${data.velkatyyppi}
@@ -91,7 +101,7 @@ Pyydän arvioimaan velkatapaukseni poistamista tai kohtuullistamista seuraavilla
 - Jäljellä oleva velka: ${data.jaljellaOlevaVelka.toFixed(2)} €
 - Onko ulosotossa: ${data.ulosotossa}
 
-Automaattinen riskiluokitus: ${arvio.riskitaso}
+Automaattinen arvio: ${arvio.otsikko || arvio.riskitaso}
 Perustelu: ${arvio.selitysTeksti}
 
 Ystävällisin terveisin,
@@ -133,7 +143,7 @@ kopioiTekstiBtn.addEventListener("click", async () => {
     await navigator.clipboard.writeText(poistopyyntoTeksti.value);
     kopioiTekstiBtn.textContent = "Kopioitu!";
     setTimeout(() => {
-      kopioiTekstiBtn.textContent = "Kopioi teksti";
+      kopioiTekstiBtn.textContent = "Kopioi asiakirja";
     }, 1200);
   } catch (error) {
     kopioiTekstiBtn.textContent = "Kopiointi epäonnistui";
