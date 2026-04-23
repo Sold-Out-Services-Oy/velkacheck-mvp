@@ -19,6 +19,7 @@ function arvioiRiski(data) {
   let otsikko = "Tilanne näyttää normaalilta";
   let selitysTeksti =
     "Tietojen perusteella velkatilanteessa ei näy selviä merkkejä virheistä tai vanhentumisesta. Voit halutessasi tarkistaa tilanteen tarkemmin varmistaaksesi oikean lopputuloksen.";
+
   const huomiot = [];
 
   if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
@@ -27,8 +28,13 @@ function arvioiRiski(data) {
     otsikko = "Sinulla voi olla merkittävä mahdollisuus";
     selitysTeksti =
       "Tietojen perusteella velkatilanteessa voi olla mahdollisuus vanhentumiseen tai virheeseen. Tämä voi vaikuttaa velan määrään tai poistumiseen. Suosittelemme toimimaan nopeasti – tällä voi olla merkittävä vaikutus velkatilanteeseesi.";
-    huomiot.push("Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä.");
-  } else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
+    huomiot.push(
+      "Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä."
+    );
+  } else if (
+    data.velkatyyppi === "Elatusapu" ||
+    data.velkatyyppi === "Verovelka"
+  ) {
     riskitaso = "keltainen";
     variLuokka = "badge--yellow";
     otsikko = "Tilanne vaatii tarkempaa selvitystä";
@@ -36,24 +42,32 @@ function arvioiRiski(data) {
       "Velkatilanteessa on tekijöitä, jotka voivat vaikuttaa oikeuksiisi. Suosittelemme tarkempaa analyysiä ennen jatkotoimia. Tässä tilanteessa lisäselvitys voi johtaa merkittävään taloudelliseen hyötyyn.";
 
     if (data.velkatyyppi === "Elatusapu") {
-      huomiot.push("Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä.");
+      huomiot.push(
+        "Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä."
+      );
     } else {
-      huomiot.push("Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen.");
+      huomiot.push(
+        "Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen."
+      );
     }
   }
 
   if (vuodetViimeMaksusta > 3) {
-    huomiot.push("Perintä tai maksujen käsittely voi olla tapahtunut myöhässä – tilanne kannattaa tarkistaa mahdollisen takaisinsaannin osalta.");
+    huomiot.push(
+      "Perintä tai maksujen käsittely voi olla tapahtunut myöhässä – tilanne kannattaa tarkistaa mahdollisen takaisinsaannin osalta."
+    );
   }
 
   if (data.ulosotossa === "Kyllä") {
-    huomiot.push("Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä.");
+    huomiot.push(
+      "Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä."
+    );
   } else {
     huomiot.push("Asia ei ole tällä hetkellä ulosotossa.");
   }
 
-  const maksusuhde =
-    data.maksettuYhteensa / ((data.maksettuYhteensa + data.jaljellaOlevaVelka) || 1);
+  const kokonaisMaara = data.maksettuYhteensa + data.jaljellaOlevaVelka;
+  const maksusuhde = kokonaisMaara > 0 ? data.maksettuYhteensa / kokonaisMaara : 0;
 
   if (maksusuhde >= 0.7) {
     huomiot.push("Suurin osa velasta on jo maksettu.");
@@ -71,13 +85,11 @@ function arvioiRiski(data) {
     otsikko,
     selitysTeksti,
     huomiot: huomiot.slice(0, 3),
-    velanIka,
-    vuodetViimeMaksusta,
   };
 }
 
 function renderoiTulos(arvio) {
-  riskBadge.textContent = arvio.otsikko || "Tilannearvio";
+  riskBadge.textContent = arvio.otsikko;
   riskBadge.className = `badge ${arvio.variLuokka}`;
   selitys.textContent = arvio.selitysTeksti;
 
@@ -97,18 +109,22 @@ function luoPoistopyyntoTeksti(data, arvio) {
 Aihe: Velan poistopyyntö
 
 Pyydän arvioimaan velkatapaukseni poistamista tai kohtuullistamista seuraavilla tiedoilla:
+
 - Velkatyyppi: ${data.velkatyyppi}
-- Tuomion vuosi: ${data.tuomionVuosi}
+- Velan vahvistusvuosi: ${data.tuomionVuosi}
 - Velan aloitusvuosi: ${data.aloitusVuosi}
 - Viimeisin maksuvuosi: ${data.viimeisinMaksuvuosi}
 - Maksettu yhteensä: ${data.maksettuYhteensa.toFixed(2)} €
 - Jäljellä oleva velka: ${data.jaljellaOlevaVelka.toFixed(2)} €
 - Onko ulosotossa: ${data.ulosotossa}
 
-Automaattinen arvio: ${arvio.otsikko || arvio.riskitaso}
+Automaattinen arvio: ${arvio.otsikko}
 Perustelu: ${arvio.selitysTeksti}
 
+Pyydän asiassa kirjallista selvitystä ja arviointia siitä, onko velan perintä ja täytäntöönpano tapahtunut asianmukaisesti.
+
 Ystävällisin terveisin,
+
 [Oma nimi]`;
 }
 
@@ -119,23 +135,37 @@ form.addEventListener("submit", (event) => {
     velkatyyppi: document.getElementById("velkatyyppi").value,
     tuomionVuosi: Number(document.getElementById("tuomionVuosi").value),
     aloitusVuosi: Number(document.getElementById("aloitusVuosi").value),
-    viimeisinMaksuvuosi: Number(document.getElementById("viimeisinMaksuvuosi").value),
-    maksettuYhteensa: Number(document.getElementById("maksettuYhteensa").value),
-    jaljellaOlevaVelka: Number(document.getElementById("jaljellaOlevaVelka").value),
+    viimeisinMaksuvuosi: Number(
+      document.getElementById("viimeisinMaksuvuosi").value
+    ),
+    maksettuYhteensa: Number(
+      document.getElementById("maksettuYhteensa").value
+    ),
+    jaljellaOlevaVelka: Number(
+      document.getElementById("jaljellaOlevaVelka").value
+    ),
     ulosotossa: document.getElementById("ulosotossa").value,
   };
 
-  viimeisinArvio = { data, arvio: arvioiRiski(data) };
+  viimeisinArvio = {
+    data,
+    arvio: arvioiRiski(data),
+  };
+
   renderoiTulos(viimeisinArvio.arvio);
 });
 
 luoLuonnosBtn.addEventListener("click", () => {
   if (!viimeisinArvio) {
-    poistopyyntoTeksti.value = "Täytä ja arvioi tiedot ennen luonnoksen luontia.";
+    poistopyyntoTeksti.value =
+      "Täytä tiedot ja arvioi tilanteesi ennen asiakirjan luomista.";
     return;
   }
 
-  poistopyyntoTeksti.value = luoPoistopyyntoTeksti(viimeisinArvio.data, viimeisinArvio.arvio);
+  poistopyyntoTeksti.value = luoPoistopyyntoTeksti(
+    viimeisinArvio.data,
+    viimeisinArvio.arvio
+  );
 });
 
 kopioiTekstiBtn.addEventListener("click", async () => {
@@ -153,5 +183,3 @@ kopioiTekstiBtn.addEventListener("click", async () => {
     kopioiTekstiBtn.textContent = "Kopiointi epäonnistui";
   }
 });
-
-// update
