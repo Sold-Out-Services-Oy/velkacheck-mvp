@@ -185,3 +185,5 @@ kopioiTekstiBtn.addEventListener("click", async () => {
     kopioiTekstiBtn.textContent = "Kopiointi epäonnistui";
   }
 });
+
+
