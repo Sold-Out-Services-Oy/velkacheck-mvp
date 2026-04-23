@@ -14,43 +14,47 @@ function arvioiRiski(data) {
   const velanIka = nykyVuosi - data.aloitusVuosi;
   const vuodetViimeMaksusta = nykyVuosi - data.viimeisinMaksuvuosi;
 
-let riskitaso = "vihreä";
-let variLuokka = "badge--green";
-let otsikko = "Tilanne näyttää normaalilta";
-let selitysTeksti = "Tietojen perusteella velkatilanteessa ei näy selviä merkkejä virheistä tai vanhentumisesta. Voit halutessasi tarkistaa tilanteen tarkemmin varmistaaksesi oikean lopputuloksen.";
-const huomiot = [];
+  let riskitaso = "vihreä";
+  let variLuokka = "badge--green";
+  let otsikko = "Tilanne näyttää normaalilta";
+  let selitysTeksti =
+    "Tietojen perusteella velkatilanteessa ei näy selviä merkkejä virheistä tai vanhentumisesta. Voit halutessasi tarkistaa tilanteen tarkemmin varmistaaksesi oikean lopputuloksen.";
+  const huomiot = [];
 
-if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
-  riskitaso = "punainen";
-  variLuokka = "badge--red";
-  otsikko = "Sinulla voi olla merkittävä mahdollisuus";
-  selitysTeksti = "Tietojen perusteella velkatilanteessa voi olla mahdollisuus vanhentumiseen tai virheeseen. Tämä voi vaikuttaa velan määrään tai poistumiseen. Suosittelemme toimimaan nopeasti – tällä voi olla merkittävä vaikutus velkatilanteeseesi.";
-  huomiot.push("Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä.");
-}
-} else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
-  riskitaso = "keltainen";
-  variLuokka = "badge--yellow";
-  otsikko = "Tilanne vaatii tarkempaa selvitystä";
-  selitysTeksti = "Velkatilanteessa on tekijöitä, jotka voivat vaikuttaa oikeuksiisi. Suosittelemme tarkempaa analyysiä ennen jatkotoimia. Tässä tilanteessa lisäselvitys voi johtaa merkittävään taloudelliseen hyötyyn.";
+  if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
+    riskitaso = "punainen";
+    variLuokka = "badge--red";
+    otsikko = "Sinulla voi olla merkittävä mahdollisuus";
+    selitysTeksti =
+      "Tietojen perusteella velkatilanteessa voi olla mahdollisuus vanhentumiseen tai virheeseen. Tämä voi vaikuttaa velan määrään tai poistumiseen. Suosittelemme toimimaan nopeasti – tällä voi olla merkittävä vaikutus velkatilanteeseesi.";
+    huomiot.push("Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä.");
+  } else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
+    riskitaso = "keltainen";
+    variLuokka = "badge--yellow";
+    otsikko = "Tilanne vaatii tarkempaa selvitystä";
+    selitysTeksti =
+      "Velkatilanteessa on tekijöitä, jotka voivat vaikuttaa oikeuksiisi. Suosittelemme tarkempaa analyysiä ennen jatkotoimia. Tässä tilanteessa lisäselvitys voi johtaa merkittävään taloudelliseen hyötyyn.";
 
-  if (data.velkatyyppi === "Elatusapu") {
-    huomiot.push("Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä.");
-  } else {
-    huomiot.push("Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen.");
+    if (data.velkatyyppi === "Elatusapu") {
+      huomiot.push("Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä.");
+    } else {
+      huomiot.push("Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen.");
+    }
   }
-}
 
-if (vuodetViimeMaksusta > 3) {
-  huomiot.push("Maksujen ajoitus voi antaa aiheen lisäselvitykseen ja mahdolliseen takaisinsaantiin.");
-}
+  if (vuodetViimeMaksusta > 3) {
+    huomiot.push("Perintä tai maksujen käsittely voi olla tapahtunut myöhässä – tilanne kannattaa tarkistaa mahdollisen takaisinsaannin osalta.");
+  }
 
-if (data.ulosotossa === "Kyllä") {
-  huomiot.push("Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä.");
-} else {
-  huomiot.push("Asia ei ole tällä hetkellä ulosotossa.");
-}
+  if (data.ulosotossa === "Kyllä") {
+    huomiot.push("Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä.");
+  } else {
+    huomiot.push("Asia ei ole tällä hetkellä ulosotossa.");
+  }
 
-  const maksusuhde = data.maksettuYhteensa / (data.maksettuYhteensa + data.jaljellaOlevaVelka || 1);
+  const maksusuhde =
+    data.maksettuYhteensa / ((data.maksettuYhteensa + data.jaljellaOlevaVelka) || 1);
+
   if (maksusuhde >= 0.7) {
     huomiot.push("Suurin osa velasta on jo maksettu.");
   } else {
@@ -61,15 +65,15 @@ if (data.ulosotossa === "Kyllä") {
     huomiot.push("Suositus: kokoa kaikki maksutositteet jatkokäsittelyä varten.");
   }
 
-return {
-  riskitaso,
-  variLuokka,
-  otsikko,
-  selitysTeksti,
-  huomiot: huomiot.slice(0, 3),
-  velanIka,
-  vuodetViimeMaksusta,
-};
+  return {
+    riskitaso,
+    variLuokka,
+    otsikko,
+    selitysTeksti,
+    huomiot: huomiot.slice(0, 3),
+    velanIka,
+    vuodetViimeMaksusta,
+  };
 }
 
 function renderoiTulos(arvio) {
