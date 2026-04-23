@@ -32,7 +32,7 @@ function arvioiRiski(data) {
   }
 
   if (vuodetViimeMaksusta > 3) {
-    huomiot.push("Maksuja liian myöhään → mahdollinen takaisinperintäriski.");
+    huomiot.push("Maksuja liian myöhään → mahdollinen takaisinsaanti.");
   }
 
   if (data.ulosotossa === "Kyllä") {
