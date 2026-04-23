@@ -5,25 +5,64 @@ const selitys = document.getElementById("selitys");
 const bulletit = document.getElementById("bulletit");
 const luoLuonnosBtn = document.getElementById("luoLuonnos");
 const poistopyyntoTeksti = document.getElementById("poistopyyntoTeksti");
+const kopioiTekstiBtn = document.getElementById("kopioiTeksti");
+
+let viimeisinArvio = null;
 
 function arvioiRiski(data) {
-  let otsikko = "Tilanne näyttää normaalilta";
+  const nykyVuosi = new Date().getFullYear();
+  const velanIka = nykyVuosi - data.aloitusVuosi;
+  const vuodetViimeMaksusta = nykyVuosi - data.viimeisinMaksuvuosi;
+
+  let riskitaso = "vihreä";
   let variLuokka = "badge--green";
-  let selitysTeksti = "Tilanteessa ei näy merkittävää riskiä.";
+  let otsikko = "Tilanne näyttää normaalilta";
+  let selitysTeksti =
+    "Tietojen perusteella velkatilanteessa ei näy selviä merkkejä virheistä tai vanhentumisesta. Voit halutessasi tarkistaa tilanteen tarkemmin varmistaaksesi oikean lopputuloksen.";
+
   const huomiot = [];
 
-  if (data.velkatyyppi === "Ulosotto") {
-    otsikko = "Tilanne vaatii tarkempaa selvitystä";
+  if (data.velkatyyppi === "Ulosotto" && velanIka > 15) {
+    riskitaso = "punainen";
+    variLuokka = "badge--red";
+    otsikko = "Sinulla voi olla merkittävä mahdollisuus";
+    selitysTeksti =
+      "Tietojen perusteella velkatilanteessa voi olla mahdollisuus vanhentumiseen tai virheeseen. Tämä voi vaikuttaa velan määrään tai poistumiseen. Suosittelemme toimimaan nopeasti – tällä voi olla merkittävä vaikutus velkatilanteeseesi.";
+    huomiot.push("Ulosoton täytäntöönpanokelpoisuus kannattaa tarkistaa viivytyksettä.");
+  } else if (data.velkatyyppi === "Elatusapu" || data.velkatyyppi === "Verovelka") {
+    riskitaso = "keltainen";
     variLuokka = "badge--yellow";
-    selitysTeksti = "Ulosotto vaatii tarkempaa analyysiä.";
-    huomiot.push("Ulosotto kannattaa tarkistaa.");
+    otsikko = "Tilanne vaatii tarkempaa selvitystä";
+    selitysTeksti =
+      "Velkatilanteessa on tekijöitä, jotka voivat vaikuttaa oikeuksiisi. Suosittelemme tarkempaa analyysiä ennen jatkotoimia. Tässä tilanteessa lisäselvitys voi johtaa merkittävään taloudelliseen hyötyyn.";
+
+    if (data.velkatyyppi === "Elatusapu") {
+      huomiot.push("Elatusapuasioissa vanhentuminen ja katkaisutoimet edellyttävät tarkempaa selvitystä.");
+    } else {
+      huomiot.push("Verovelan täytäntöönpanon määräajat ja katkaisutoimet kannattaa tarkistaa erikseen.");
+    }
+  }
+
+  if (vuodetViimeMaksusta > 3) {
+    huomiot.push("Perintä tai maksujen käsittely voi olla tapahtunut myöhässä – tilanne kannattaa tarkistaa mahdollisen takaisinsaannin osalta.");
+  }
+
+  if (data.ulosotossa === "Kyllä") {
+    huomiot.push("Asia on tällä hetkellä ulosotossa, joten tilanteen tarkistaminen kannattaa tehdä viivytyksettä.");
+  } else {
+    huomiot.push("Asia ei ole tällä hetkellä ulosotossa.");
+  }
+
+  while (huomiot.length < 3) {
+    huomiot.push("Suositus: kokoa kaikki maksutositteet jatkokäsittelyä varten.");
   }
 
   return {
-    otsikko,
+    riskitaso,
     variLuokka,
+    otsikko,
     selitysTeksti,
-    huomiot
+    huomiot: huomiot.slice(0, 3),
   };
 }
 
@@ -42,17 +81,77 @@ function renderoiTulos(arvio) {
   tulos.classList.remove("hidden");
 }
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+function luoPoistopyyntoTeksti(data, arvio) {
+  return `Vastaanottaja: Toimivaltainen viranomainen
+
+Aihe: Velan poistopyyntö
+
+Pyydän arvioimaan velkatapaukseni poistamista tai kohtuullistamista seuraavilla tiedoilla:
+
+- Velkatyyppi: ${data.velkatyyppi}
+- Velan vahvistusvuosi: ${data.tuomionVuosi}
+- Velan aloitusvuosi: ${data.aloitusVuosi}
+- Viimeisin maksuvuosi: ${data.viimeisinMaksuvuosi}
+- Maksettu yhteensä: ${Number(data.maksettuYhteensa).toFixed(2)} €
+- Jäljellä oleva velka: ${Number(data.jaljellaOlevaVelka).toFixed(2)} €
+- Onko ulosotossa: ${data.ulosotossa}
+
+Automaattinen arvio: ${arvio.otsikko}
+Perustelu: ${arvio.selitysTeksti}
+
+Pyydän asiassa kirjallista selvitystä ja arviointia siitä, onko velan perintä ja täytäntöönpano tapahtunut asianmukaisesti.
+
+Ystävällisin terveisin,
+
+[Oma nimi]`;
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
 
   const data = {
-    velkatyyppi: document.getElementById("velkatyyppi").value
+    velkatyyppi: document.getElementById("velkatyyppi").value,
+    tuomionVuosi: Number(document.getElementById("tuomionVuosi").value),
+    aloitusVuosi: Number(document.getElementById("aloitusVuosi").value),
+    viimeisinMaksuvuosi: Number(document.getElementById("viimeisinMaksuvuosi").value),
+    maksettuYhteensa: Number(document.getElementById("maksettuYhteensa").value),
+    jaljellaOlevaVelka: Number(document.getElementById("jaljellaOlevaVelka").value),
+    ulosotossa: document.getElementById("ulosotossa").value,
   };
 
-  const arvio = arvioiRiski(data);
-  renderoiTulos(arvio);
+  viimeisinArvio = {
+    data,
+    arvio: arvioiRiski(data),
+  };
+
+  renderoiTulos(viimeisinArvio.arvio);
 });
 
-luoLuonnosBtn?.addEventListener("click", () => {
-  poistopyyntoTeksti.value = "Poistopyyntö luotu (testiversio).";
+luoLuonnosBtn.addEventListener("click", () => {
+  if (!viimeisinArvio) {
+    poistopyyntoTeksti.value =
+      "Täytä tiedot ja arvioi tilanteesi ennen asiakirjan luomista.";
+    return;
+  }
+
+  poistopyyntoTeksti.value = luoPoistopyyntoTeksti(
+    viimeisinArvio.data,
+    viimeisinArvio.arvio
+  );
+});
+
+kopioiTekstiBtn.addEventListener("click", async () => {
+  if (!poistopyyntoTeksti.value.trim()) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(poistopyyntoTeksti.value);
+    kopioiTekstiBtn.textContent = "Kopioitu!";
+    setTimeout(() => {
+      kopioiTekstiBtn.textContent = "Kopioi asiakirja";
+    }, 1200);
+  } catch (error) {
+    kopioiTekstiBtn.textContent = "Kopiointi epäonnistui";
+  }
 });
