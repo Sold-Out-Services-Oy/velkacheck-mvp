@@ -174,3 +174,20 @@ textarea {
   color: var(--muted);
   margin-top: -2px;
 }
+.next-steps {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.next-steps h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.next-steps ul {
+  padding-left: 18px;
+  margin: 8px 0 0;
+}
