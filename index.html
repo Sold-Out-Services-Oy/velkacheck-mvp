@@ -27,8 +27,8 @@
 
           <label>
             Velan vahvistusvuosi
-  <small class="field-help">(esim. tuomio tai viranomaispäätös)</small>
-  <input type="number" id="tuomionVuosi" min="1900" max="2100" required />
+            <small class="field-help">(esim. tuomio tai viranomaispäätös)</small>
+            <input type="number" id="tuomionVuosi" min="1900" max="2100" required />
           </label>
 
           <label>
@@ -57,33 +57,36 @@
               <option value="">Valitse</option>
               <option value="Kyllä">Kyllä</option>
               <option value="Ei">Ei</option>
+            </select>
+          </label>
 
           <button type="submit" class="btn btn--primary">Arvioi tilanteesi</button>
         </form>
 
         <section id="tulos" class="result hidden" aria-live="polite">
-          <div id="riskBadge" class="badge">Riski</div>
+          <div id="riskBadge" class="badge">Tilannearvio</div>
           <p id="selitys"></p>
           <ul id="bulletit"></ul>
         </section>
-</html>
-<div class="next-steps">
-  <h3>Seuraavat askeleet</h3>
-  <ul>
-    <li>Tallenna tämä analyysi talteen</li>
-    <li>Kokoa kaikki velkaan liittyvät asiakirjat</li>
-    <li>Luo henkilökohtainen poistopyyntö ja toimita se viranomaiselle</li>
-  </ul>
-</div>
-          <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>  
-              <div class="draft-cta">
-  <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>
-  <p class="draft-help">Saat valmiin asiakirjan, jota voit käyttää sellaisenaan tai muokata tarvittaessa.</p>
-</div>
-              <section class="draft-section">
+
+        <div class="next-steps">
+          <h3>Seuraavat askeleet</h3>
+          <ul>
+            <li>Tallenna tämä analyysi talteen</li>
+            <li>Kokoa kaikki velkaan liittyvät asiakirjat</li>
+            <li>Luo henkilökohtainen poistopyyntö ja toimita se viranomaiselle</li>
+          </ul>
+        </div>
+
+        <div class="draft-cta">
+          <button id="luoLuonnos" type="button" class="btn">Luo henkilökohtainen poistopyyntö</button>
+          <p class="draft-help">Saat valmiin asiakirjan, jota voit käyttää sellaisenaan tai muokata tarvittaessa.</p>
+        </div>
+
+        <section class="draft-section">
           <label for="poistopyyntoTeksti">Valmis velan poistopyyntö</label>
-          <textarea id="poistopyyntoTeksti" rows="10" placeholder="Luonnos ilmestyy tähän..."></textarea>
-          <button id="kopioi asiakirja" type="button" class="btn">Kopioi asiakirja</button>
+          <textarea id="poistopyyntoTeksti" rows="10" placeholder="Henkilökohtainen poistopyyntö luodaan tähän, kun painat yllä olevaa nappia."></textarea>
+          <button id="kopioiTeksti" type="button" class="btn">Kopioi asiakirja</button>
         </section>
 
         <footer class="disclaimer">
@@ -93,4 +96,5 @@
     </main>
 
     <script src="script.js"></script>
-  </body><!doctype html>
+  </body>
+</html>
